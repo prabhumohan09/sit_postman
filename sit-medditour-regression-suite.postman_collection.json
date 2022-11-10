@@ -1,0 +1,1050 @@
+{
+	"info": {
+		"_postman_id": "dc4ddfa5-22cc-4035-8a24-b6d914cbee17",
+		"name": "sit-medditour-regression-suite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10304991"
+	},
+	"item": [
+		{
+			"name": "authentication",
+			"item": [
+				{
+					"name": "positive",
+					"item": [
+						{
+							"name": "auth-user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"    var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user availability & name\", function () {\r",
+											"    pm.expect(jsonData.content.userExist).to.eql(true);\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user profile type & reference id's\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-checkUser",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-checkUser"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "negative",
+					"item": [
+						{
+							"name": "auth-user-without-tokenId-header",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 401\", function () {\r",
+											"    pm.response.to.have.status(401);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.success).to.eql(false);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user name\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.content.errorMsg).to.eql(\"Authentication token missing\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-checkUser",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-checkUser"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "auth-user-without-deviceType-header",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 400\", function () {\r",
+											"    pm.response.to.have.status(400);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.success).to.eql(false);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user name\", function () {\r",
+											"    var jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.content.errorMsg).to.eql(\"Mandatory header(s) missing\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-checkUser",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-checkUser"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "profile",
+			"item": [
+				{
+					"name": "validate-schema",
+					"item": [
+						{
+							"name": "get-contact-data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"const schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"success\": {\r",
+											"      \"type\": \"boolean\"\r",
+											"    },\r",
+											"    \"content\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"credentials\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"profileType\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"userReferenceID\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"profileReferenceID\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"completionPercentage\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"profileStatus\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"contactDetailsList\": {\r",
+											"          \"type\": \"object\",\r",
+											"          \"properties\": {\r",
+											"            \"Email\": {\r",
+											"              \"type\": \"array\",\r",
+											"              \"items\": [\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"id\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"label\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"value\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"isNotifiable\": {\r",
+											"                      \"type\": \"boolean\"\r",
+											"                    },\r",
+											"                    \"isVerified\": {\r",
+											"                      \"type\": \"boolean\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"id\",\r",
+											"                    \"label\",\r",
+											"                    \"value\",\r",
+											"                    \"isNotifiable\",\r",
+											"                    \"isVerified\"\r",
+											"                  ]\r",
+											"                }\r",
+											"              ]\r",
+											"            },\r",
+											"            \"Mobile\": {\r",
+											"              \"type\": \"array\",\r",
+											"              \"items\": [\r",
+											"                {\r",
+											"                  \"type\": \"object\",\r",
+											"                  \"properties\": {\r",
+											"                    \"id\": {\r",
+											"                      \"type\": \"integer\"\r",
+											"                    },\r",
+											"                    \"label\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"countryCode\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"value\": {\r",
+											"                      \"type\": \"string\"\r",
+											"                    },\r",
+											"                    \"isNotifiable\": {\r",
+											"                      \"type\": \"boolean\"\r",
+											"                    },\r",
+											"                    \"isVerified\": {\r",
+											"                      \"type\": \"boolean\"\r",
+											"                    }\r",
+											"                  },\r",
+											"                  \"required\": [\r",
+											"                    \"id\",\r",
+											"                    \"label\",\r",
+											"                    \"countryCode\",\r",
+											"                    \"value\",\r",
+											"                    \"isNotifiable\",\r",
+											"                    \"isVerified\"\r",
+											"                  ]\r",
+											"                }\r",
+											"              ]\r",
+											"            }\r",
+											"          },\r",
+											"          \"required\": [\r",
+											"            \"Email\",\r",
+											"            \"Mobile\"\r",
+											"          ]\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"credentials\",\r",
+											"        \"profileType\",\r",
+											"        \"userReferenceID\",\r",
+											"        \"profileReferenceID\",\r",
+											"        \"completionPercentage\",\r",
+											"        \"profileStatus\",\r",
+											"        \"contactDetailsList\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"success\",\r",
+											"    \"content\"\r",
+											"  ]\r",
+											"};\r",
+											"\r",
+											"pm.test(\"validate get-contact-data schema\", () => {\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-getContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-getContactData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-user-data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"const schema = {\r",
+											"  \"type\": \"object\",\r",
+											"  \"properties\": {\r",
+											"    \"success\": {\r",
+											"      \"type\": \"boolean\"\r",
+											"    },\r",
+											"    \"content\": {\r",
+											"      \"type\": \"object\",\r",
+											"      \"properties\": {\r",
+											"        \"credentials\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"userReferenceID\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"profileReferenceID\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"completionPercentage\": {\r",
+											"          \"type\": \"integer\"\r",
+											"        },\r",
+											"        \"profileStatus\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"profileType\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"firstName\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"lastName\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"userName\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"emailID\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"gender\": {\r",
+											"          \"type\": \"string\"\r",
+											"        },\r",
+											"        \"dob\": {\r",
+											"          \"type\": \"string\"\r",
+											"        }\r",
+											"      },\r",
+											"      \"required\": [\r",
+											"        \"credentials\",\r",
+											"        \"userReferenceID\",\r",
+											"        \"profileReferenceID\",\r",
+											"        \"completionPercentage\",\r",
+											"        \"profileStatus\",\r",
+											"        \"profileType\",\r",
+											"        \"firstName\",\r",
+											"        \"lastName\",\r",
+											"        \"userName\",\r",
+											"        \"emailID\",\r",
+											"        \"gender\",\r",
+											"        \"dob\",\r",
+											"        \"contactCountryCode\",\r",
+											"        \"contactMobileNumber\"\r",
+											"      ]\r",
+											"    }\r",
+											"  },\r",
+											"  \"required\": [\r",
+											"    \"success\",\r",
+											"    \"content\"\r",
+											"  ]\r",
+											"}\r",
+											"\r",
+											"pm.test(\"validate get-user-data schema\", () => {\r",
+											"    pm.response.to.have.jsonSchema(schema);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-getUserData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-getUserData"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "positive",
+					"item": [
+						{
+							"name": "get-user-profile-info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user profile info\", function () {\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"    pm.expect(jsonData.content.completionPercentage).to.eql(20);\r",
+											"\r",
+											"    pm.expect(jsonData.content.firstName).to.eql(\"Prabhu\");\r",
+											"    pm.expect(jsonData.content.lastName).to.eql(\"Mohan\");\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.emailID).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.gender).to.eql(\"Male\");\r",
+											"    pm.expect(jsonData.content.dob).to.eql(\"2004-09-15\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-getUserData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-getUserData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get-user-contact-info",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user profile info\", function () {\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"    pm.expect(jsonData.content.completionPercentage).to.eql(20);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user contact details - Email\", function () {\r",
+											"    //assert first contact\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Email[0].label).to.eql(\"Default\");\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Email[0].value).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Email[0].isNotifiable).to.eql(true);\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Email[0].isVerified).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert user contact details - Mobile\", function () {\r",
+											"    //assert first contact\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Mobile[0].label).to.eql(\"Default\");\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Mobile[0].countryCode).to.eql(\"91\");\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Mobile[0].value).to.eql(\"9080423483\");\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Mobile[0].isNotifiable).to.eql(true);\r",
+											"    pm.expect(jsonData.content.contactDetailsList.Mobile[0].isVerified).to.eql(true);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{endpoint}}/api-getContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-getContactData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create-mobile-contact2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert contact info\", function () {\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.contactCreated).to.eql(true);\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"});\r",
+											"\r",
+											"pm.collectionVariables.set(\"contact_id\", jsonData.content.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"contactType\": \"Mobile\",\r\n    \"label\": \"Personal\",\r\n    \"countryCode\": \"91\",\r\n    \"value\": \"9080423482\",\r\n    \"isNotifiable\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api-setContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-setContactData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-mobile-contact2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert contact info\", function () {\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.contactDeleted).to.eql(true);\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let contactId = pm.collectionVariables.get(\"contact_id\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": {{contact_id}}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api-deleteContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-deleteContactData"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "negative",
+					"item": [
+						{
+							"name": "create-exisitng-contact",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"    // as of now it's throwing 502 which is incorrect, need to log a jira\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(false);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert error message\", function () {\r",
+											"    pm.expect(jsonData.content.errorMsg).to.eql(\"Mobile number already exists.9080423483\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"contactType\": \"Mobile\",\r\n    \"label\": \"Personal\",\r\n    \"countryCode\": \"91\",\r\n    \"value\": \"9080423483\",\r\n    \"isNotifiable\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api-setContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-setContactData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create-mobile-contact2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert contact info\", function () {\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.contactCreated).to.eql(true);\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"});\r",
+											"\r",
+											"pm.collectionVariables.set(\"contact_id\", jsonData.content.id);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"contactType\": \"Mobile\",\r\n    \"label\": \"Personal\",\r\n    \"countryCode\": \"91\",\r\n    \"value\": \"9080423482\",\r\n    \"isNotifiable\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api-setContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-setContactData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create-mobile-contact3",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 403\", function () {\r",
+											"    pm.response.to.have.status(403);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success false\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(false);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert error message\", function () {\r",
+											"    pm.expect(jsonData.content.errorMsg).to.eql(\"Can't insert more than two Mobile details\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"contactType\": \"Mobile\",\r\n    \"label\": \"Personal\",\r\n    \"countryCode\": \"91\",\r\n    \"value\": \"9080423482\",\r\n    \"isNotifiable\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api-setContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-setContactData"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete-mobile-contact2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"status code is 201\", function () {\r",
+											"    pm.response.to.have.status(201);\r",
+											"});\r",
+											"\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.test(\"assert success status\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"assert contact info\", function () {\r",
+											"    pm.expect(jsonData.content.userName).to.eql(\"prabhumohan09@gmail.com\");\r",
+											"    pm.expect(jsonData.content.contactDeleted).to.eql(true);\r",
+											"    pm.expect(jsonData.content.profileType).to.eql(\"Patient\");\r",
+											"    pm.expect(jsonData.content.userReferenceID).to.eql(\"MTUS00110\");\r",
+											"    pm.expect(jsonData.content.profileReferenceID).to.eql(\"MTPP00096\");\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let contactId = pm.collectionVariables.get(\"contact_id\");"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Tokenid",
+										"value": "{{patientToken}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Request-Device",
+										"value": "WEB",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": {{contact_id}}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{endpoint}}/api-deleteContactData",
+									"host": [
+										"{{endpoint}}"
+									],
+									"path": [
+										"api-deleteContactData"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "endpoint",
+			"value": "http://sit-stg-app.herokuapp.com",
+			"type": "string"
+		},
+		{
+			"key": "patientToken",
+			"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkVlSkhIdERrXzliZWJNUjBTenpkNyJ9.eyJuaWNrbmFtZSI6InByYWJodW1vaGFuMDkiLCJuYW1lIjoicHJhYmh1bW9oYW4wOUBnbWFpbC5jb20iLCJwaWN0dXJlIjoiaHR0cHM6Ly9zLmdyYXZhdGFyLmNvbS9hdmF0YXIvOGFiMDMzNzA2OThhNDUzMDM2MDJjZjgzZmZjMjZmN2M_cz00ODAmcj1wZyZkPWh0dHBzJTNBJTJGJTJGY2RuLmF1dGgwLmNvbSUyRmF2YXRhcnMlMkZwci5wbmciLCJ1cGRhdGVkX2F0IjoiMjAyMi0xMS0wNFQwODo0Nzo0NC44NTJaIiwiZW1haWwiOiJwcmFiaHVtb2hhbjA5QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL2Rldi1zaXQudXMuYXV0aDAuY29tLyIsInN1YiI6ImVtYWlsfDYyYTA5NzRhNmYxYTFhNWNiYjNkODkwMSIsImF1ZCI6InlBN0RkdFRKVEhYZmJHa1RzWUxQSEdXbWcwVU1QU2pGIiwiaWF0IjoxNjY3NTUxNjY0LCJleHAiOjE2Njc2MzgwNjR9.DAunP9OxdXrD9HxshR4A7m60EF1QoCBQFo__u38ztwACwktDQZMvbHUnyuwDVRl2ZrMKhS5AG7WqRFKM9ZNlPiQKvhtppbBO5cpwJOR4ggDtn6br6IhvEwRJGfi8UUmoPaAqlnQifg8IiL99HdeXQd1P3LycNIQlIMXnMFzZylvTpk8Q2YmYGh8A7t2udAQt0kj-bGMgaCTMBDClnShDXmB-HT5-TKz6YsEbM8bk8Xw5A0cPXvek9J2BvOBhxpERu15bgpdVQ0XaBA7IbyMqCG1Dl5w_-9JBZtKwm_gvB8iqcFnSj_8mdOCDq81IQasIW0iVn-UB-tG0vlMmtgP8Gg",
+			"type": "string"
+		},
+		{
+			"key": "contact_id",
+			"value": ""
+		}
+	]
+}
